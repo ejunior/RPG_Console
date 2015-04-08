@@ -2,6 +2,7 @@ __author__ = 'ejunior'
 
 from commands.cls import *
 
+
 keep_going = True
 
 commandList = {
@@ -9,13 +10,15 @@ commandList = {
     "exit": Exit()
 }
 
-context = classmethod
-context.running = true
+
+class context:
+    running = True
+
 
 while keep_going:
-    command = raw_input('RPG> ').strip()
 
     try:
+        command = input('RPG> ').strip()
         (commandList[command.lower()]).execute()
     except:
         print('Invalid Command.')

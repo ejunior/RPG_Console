@@ -6,7 +6,7 @@ from commands.command import Command
 class Cls(Command):
 
     def __repr__(self):
-        print self.__class__.name()
+        print( self.__class__.name())
         return ''
 
     def execute(self, context):
@@ -17,5 +17,5 @@ class Cls(Command):
 
 class Exit(Command):
 
-    def execute(self):
-        quit()
+    def execute(self,context):
+        context.running = False

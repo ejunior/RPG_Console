@@ -1,3 +1,5 @@
+from core.weapon import sword
+
 __author__ = 'ejunior'
 
 
@@ -8,9 +10,13 @@ class Player:
         self._equip_weapon = None
         self._equip_equip_shield = None
 
-    def equip_wepon(self,weapon):
-        self._equip_weapon = weapon;
-        self.mod_list.extend(weapon.mods)
+    def equip_wepon(self, weapon):
+        self._equip_weapon = weapon
+
+        self._mod_list.extend(weapon.mods)
+        print(weapon)
+        print("wepon " + " equiped")
 
 
-
+p = Player()
+p.equip_wepon(sword)
