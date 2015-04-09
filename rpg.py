@@ -1,24 +1,18 @@
 __author__ = 'ejunior'
 
-from commands.cls import *
+from console.commands import *
 
 
-keep_going = True
+ctx = Context()
 
-commandList = {
-    "cls": Cls(),
-    "exit": Exit()
-}
-
-
-class context:
-    running = True
-
-
-while keep_going:
+while ctx.running:
 
     try:
-        command = input('RPG> ').strip()
-        (commandList[command.lower()]).execute()
-    except:
-        print('Invalid Command.')
+        command = input('RPG> ').strip().lower()
+        if command in commandList:
+            (commandList[command]).execute(ctx)
+        else:
+            print('Invalid Command.')
+    except Exception:
+        raise
+
