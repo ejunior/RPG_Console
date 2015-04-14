@@ -1,6 +1,5 @@
 __author__ = 'ejunior'
 
-
 from termcolor import colored
 import os
 print(os.name)
@@ -11,6 +10,7 @@ if os.name == "nt":
 
 print(colored('Boo will miss you', 'red'))
 # print(Back.GREEN + 'and with a green background')
+
 
 class Command:
     def execute(self, context):
