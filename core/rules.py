@@ -1,6 +1,15 @@
 import random
 
+from core.player import Player
+
+
 __author__ = 'ejunior'
+
+'''
+
+print(GurpsDiceRules.skillroll(5))
+
+'''
 
 
 class _Dice:
@@ -33,10 +42,6 @@ class _Dice:
             # print("pool", pool)
         # print("mult ", pool)
         return pool
-
-
-d20 = _Dice(20)
-d6 = _Dice(6)
 
 
 class GurpsDiceRules:
@@ -73,4 +78,30 @@ class GurpsDiceRules:
         return _pool, _status
 
 
-print(GurpsDiceRules.skillroll(5))
+class JRRPGRules:
+    @staticmethod
+    def main_weapon_full_attack_resolution(attacker: Player, adversary: Player):
+        """
+        Must return a tuple result
+        example: (diceRoll, critical)
+                 (diceRoll, failure)
+        """
+
+        critical_chance = (20,) if attacker.weapon is None else attacker.weapon.critical_chance
+        critical_chance += (1,)
+        # print("critical_chance", critical_chance)
+
+        df = 10 + adversary.defense_bonus
+        # print("adversary.defense ", df)
+        roll = d20()
+        # print("d20 roll", roll)
+        att = attacker.attack_bonus + roll
+        # print("attacker.attack (+", attacker.attack_bonus, " attack bonus) ", att)
+
+        resolution = "critical " if roll in critical_chance else ""
+        resolution += "hit" if att >= df else "miss"
+        return att - df, resolution
+
+
+d20 = _Dice(20)
+d6 = _Dice(6)

@@ -1,66 +1,73 @@
-from core.rules import d20
-from core.weapon import sword, Weapon
+from core.weapon import Weapon
 
 __author__ = 'ejunior'
 
 
 class Player:
-    def __str__(self):
-        return "player({})-> ST({}), DX({}), IQ({}), HT({})".format(self._name, self._ST, self._DX, self._IQ, self._HT)
+    _npc_default_name_counter = 0
 
-    def __init__(self, name: str, st=10, dx=10, iq=10, ht=10):
-        self._name = name
-        self._mod_list = []
-        self._weapon = None
+    def __str__(self):
+        return "player({})-> ST({}), DX({}), IQ({}), HT({})".format(self.name, self.st, self.dx, self.iq, self.ht)
+
+    def __init__(self, name=None, st=10, dx=10, iq=10, ht=10):
+        if name is not None:
+            self.name = name
+        else:
+            self.name = Player._get_a_default_name()
+
+        self.weapon = None
         self._shield = None
-        self._Armor = None
-        self._ST = st
-        self._DX = dx
-        self._IQ = iq
-        self._HT = ht
+        self._armor = None
+
+        self.st = st
+        self.dx = dx
+        self.iq = iq
+        self.ht = ht
+
+    @staticmethod
+    def _get_a_default_name():
+        Player._npc_default_name_counter += 1
+        return "NPC" + str(Player._npc_default_name_counter)
+
+    @property
+    def stats(self):
+        return dict(ST=self.st, DX=self.dx, IQ=self.iq, HT=self.ht)
+
+    #
+    # Attack
 
     @property
     def base_attack_bonus(self):
-        return self._DX // 2 - 5
+        return self.dx // 2 - 5
 
     @property
-    def full_attack_bonus(self):
-        if self._weapon is not None:
-            return self.base_attack_bonus + self._weapon.attack_bonus()  # consider to include modifiers
-        else:
-            return self.base_attack_bonus
+    def attack_bonus(self):
+        return self.base_attack_bonus if self.weapon is None \
+            else self.base_attack_bonus + self.weapon.attack_bonus()  # consider to include modifiers
 
-    def equip_weapon(self, weapon: Weapon):
-        self._weapon = weapon
-        self._mod_list.extend(weapon.mods)
-        print(weapon.type() + " weapon equiped")
+    def equip_primary_weapon(self, weapon: Weapon):
+        self.weapon = weapon
 
-    def weapon_full_attack(self, enemy):
-        return enemy.defense - self.full_attack_bonus + d20
+    def unequip_primary_weapon(self):
+        self.weapon = None
+
+    #
+    # defense
 
     @property
     def base_defense_bonus(self) -> int:
-        return self._DX // 2 - 5
+        return self.dx // 2 - 5
 
     @property
-    def defense(self):
-        defense = 0
-        if self._Armor is not None:
-            defense = self._Armor.defense_bonus
-        if self._shield is not None:
-            defense += self._shield.defense_bonus
+    def defense_bonus(self):
+        defense = 0 if self._armor is None else self._armor.defense_bonus
+        defense += 0 if self._shield is None else self._shield.defense_bonus
         return defense + self.base_defense_bonus
 
 
-p1 = Player("zack", 12, 15, 10, 9)
-p2 = Player("noob", 10, 7, 10, 7)
+class PlayerError(Exception):
+    pass
 
-p1.equip_weapon(sword)
-print(p1.weapon_full_attack(p2))
-print(p2.weapon_full_attack(p1))
 
-print("p1 base attack %+d " % p1.base_attack_bonus)
-print("p2 base attack %+d" % p2.base_attack_bonus)
-print(p1)
-print(p2)
-print(p2.weapon_full_attack(p1))
+class InvalidEquipmentError(PlayerError):
+    pass
