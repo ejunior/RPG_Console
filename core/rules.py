@@ -1,15 +1,9 @@
 import random
 
-from core.player import Player
+from core.character import Character, SimpleCharacter
 
 
 __author__ = 'ejunior'
-
-'''
-
-print(GurpsDiceRules.skillroll(5))
-
-'''
 
 
 class _Dice:
@@ -44,8 +38,15 @@ class _Dice:
         return pool
 
 
+d20 = _Dice(20)
+d6 = _Dice(6)
+
+
 class GurpsDiceRules:
-    d6 = _Dice(6)
+    """
+        just wanted to do this :)
+        print(GurpsDiceRules.skillroll(5))
+    """
 
     @staticmethod
     def skillroll(skill):
@@ -79,21 +80,70 @@ class GurpsDiceRules:
 
 
 class JRRPGRules:
+    """
+    Dinamics of the game
+
+    Option1:  not good enough, but works om persentile not skill based rpgs
+        roll against
+            if roll less than defense roll
+                defended or miss
+            if roll higher than defense roll
+                hit
+
+    Option2: tooo simple
+        Defense Roll if possible
+        atack roll > defense roll
+            hit
+        else
+            miss
+
+    Option3: skill based, preferred (needs bounded roll D20 or 3D6 rolls)
+        roll agains attack skill
+        if not succedded
+            miss
+        else
+            subtrack de difference from defese roll
+            roll defense
+            if succedded
+                defended (save difference to attack bonus) -> attacker better use a defense roll next turn
+            else
+                hit
+
+    The Problem is that skill base rpg are too hard to code
+
+    say what? i'll do some basic stuff, just to keep rolling.
+
+
+        Separate
+            Defense
+            Damage Resistence
+
+
+        skill list
+        sword
+        bow
+        magic
+        shield
+        (...)
+
+"""
     @staticmethod
-    def main_weapon_full_attack_resolution(attacker: Player, adversary: Player):
+    def attack_resolution(attacker: Character, adversary: Character):
         """
+        combat attack resolution, using weapon in hand
+
         Must return a tuple result
-        example: (diceRoll, critical)
+        example: (diceRoll, critical, dmg)
                  (diceRoll, failure)
         """
 
+        # getting critcal rolls numbers
         critical_chance = (20,) if attacker.weapon is None else attacker.weapon.critical_chance
         critical_chance += (1,)
-        # print("critical_chance", critical_chance)
 
         df = 10 + adversary.defense_bonus
-        # print("adversary.defense ", df)
-        roll = d20()
+
+        roll = d20
         # print("d20 roll", roll)
         att = attacker.attack_bonus + roll
         # print("attacker.attack (+", attacker.attack_bonus, " attack bonus) ", att)
@@ -102,6 +152,37 @@ class JRRPGRules:
         resolution += "hit" if att >= df else "miss"
         return att - df, resolution
 
+    def attack(self):
+        pass
 
-d20 = _Dice(20)
-d6 = _Dice(6)
+
+class SimpleRules:
+    def __init__(self, a: SimpleCharacter, d: SimpleCharacter):
+        self.p1 = a
+        self.p2 = d
+
+    def attack(self):
+        pass
+
+    def defense(self):
+        pass
+
+
+class Encounter:
+    def __init__(self, *members):
+        self.turn_players_list = []
+        self.turn = 0
+        self.combatants = []
+        for m in members:
+            self.combatants.append(m)
+
+    def roll_initiative(self):
+        self.turn = 1
+        l = []
+        for c in self.combatants:
+            l.append((d20, c))  # put the d20 roll and a character sheet on a sorted list
+        l.sort(key=lambda tup: tup[0], reverse=True)  # sort by initiative roll
+        self.turn_players_list = l
+
+    def get_player_in_turn(self):
+        return self.turn_players_list.pop()
